@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>تسجيل</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <script src="https://www.gstatic.com/firebasejs/8.4.2/firebase.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f4f8;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            direction: rtl;
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        .form {
+            margin-bottom: 20px;
+        }
+
+            .form div {
+                position: relative;
+            }
+
+            .form input,
+            .form select {
+                width: calc(100% - 20px);
+                padding: 10px;
+                margin-bottom: 15px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                font-size: 16px;
+            }
+
+        .buttons {
+            text-align: center;
+        }
+
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+            button:hover {
+                background-color: #218838;
+            }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+
+            h2 {
+                font-size: 24px;
+            }
+
+            button {
+                width: 100%;
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>تسجيل اعضاء الفرق الفرعية لفريق الامن السيبراني العراقي</h2>
+        <hr />
+        <form id="registrationForm">
+            <div class="form">
+                <div>
+                    <i class="fas fa-user"></i>
+                    الاسم: <input type="text" name="name" id="name" required />
+                </div>
+                <div>
+                    <i class="fas fa-phone"></i>
+                    رقم الهاتف: <input type="text" name="phone" id="phone" required />
+                </div>
+                <div>
+                    <i class="fas fa-envelope"></i>
+                    الايميل الرسمي: <input type="email" name="email" id="email" required />
+                </div>
+                <div>
+                    <i class="fas fa-building"></i>
+                    الوزارة:
+                    <select name="ministry" id="ministry" required>
+                        <option value="" disabled selected>اختر الوزارة</option>
+                        <option value="وزارة الداخلية">وزارة الداخلية</option>
+                        <option value="وزارة الدفاع">وزارة الدفاع</option>
+                        <option value="وزارة التعليم العالي والبحث العلمي">وزارة التعليم العالي والبحث العلمي</option>
+                        <option value="وزارة الصحة">وزارة الصحة</option>
+                        <option value="وزارة الخارجية">وزارة الخارجية</option>
+                        <option value="وزارة العمل والشؤون الاجتماعية">وزارة العمل والشؤون الاجتماعية</option>
+                        <option value="وزارة الاتصالات">وزارة الاتصالات</option>
+                        <option value="وزارة التجارة">وزارة التجارة</option>
+                        <option value="وزارة النفط">وزارة النفط</option>
+                        <option value="وزارة الكهرباء">وزارة الكهرباء</option>
+                        <option value="وزارة الثقافة">وزارة الثقافة</option>
+                        <option value="وزارة الشباب والرياضة">وزارة الشباب والرياضة</option>
+                        <option value="وزارة الصناعة والمعادن">وزارة الصناعة والمعادن</option>
+                        <option value="وزارة الزراعة">وزارة الزراعة</option>
+                        <option value="وزارة التخطيط">وزارة التخطيط</option>
+                        <option value="وزارة السياحة والآثار">وزارة السياحة والآثار</option>
+                    </select>
+                </div>
+                <div>
+                    <i class="fas fa-user-tie"></i>
+                    المنصب: <input type="text" name="position" id="position" required />
+                </div>
+            </div>
+
+            <div class="buttons">
+                <button type="submit" id="insert">Register</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        var firebaseConfig = {
+            apiKey: "AIzaSyAQKL51hQ2PO2xriA7zmhIf99AqHs09P_M",
+            authDomain: "crudjava-d39ff.firebaseapp.com",
+            databaseURL: "https://crudjava-d39ff-default-rtdb.firebaseio.com",
+            projectId: "crudjava-d39ff",
+            storageBucket: "crudjava-d39ff.appspot.com",
+            messagingSenderId: "376022203201",
+            appId: "1:376022203201:web:1736aa77db0b2f37fcbfc0"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        let verificationId;
+
+        document.getElementById("registrationForm").onsubmit = function (event) {
+            event.preventDefault(); // Prevent form submission
+
+            var nameV = document.getElementById("name").value;
+            var phoneV = document.getElementById("phone").value;
+            var emailV = document.getElementById("email").value;
+            var ministryV = document.getElementById("ministry").value;
+            var positionV = document.getElementById("position").value;
+
+            // Store data in Firebase
+            firebase.database().ref("users/" + phoneV).set({
+                name: nameV,
+                phone: phoneV,
+                email: emailV,
+                ministry: ministryV,
+                position: positionV,
+            })
+                .then(() => {
+                    // After successful registration, send OTP
+                    const appVerifier = new firebase.auth.RecaptchaVerifier('insert', {
+                        'size': 'invisible'
+                    });
+
+                    firebase.auth().signInWithPhoneNumber('+964' + phoneV, appVerifier)
+                        .then((confirmationResult) => {
+                            verificationId = confirmationResult.verificationId;
+                            Swal.fire({
+                                icon: 'info',
+                                title: 'OTP Sent',
+                                text: 'Please enter the OTP sent to your phone.',
+                                confirmButtonText: 'OK'
+                            });
+                            // You can add an input field for the OTP here if you want
+                        })
+                        .catch((error) => {
+                            console.error('Error sending OTP:', error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Failed to send OTP. ' + error.message,
+                                confirmButtonText: 'OK'
+                            });
+                        });
+                })
+                .catch((error) => {
+                    console.error('Error storing data:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to register. ' + error.message,
+                        confirmButtonText: 'OK'
+                    });
+                });
+        };
+    </script>
+</body>
+</html>
